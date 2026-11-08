@@ -1,0 +1,107 @@
+
+# ==========================================
+# LIVESHIELD V6 — GIT IGNORE
+# ==========================================
+
+# 1. PYTHON VIRTUAL ENVIRONMENTS
+.venv/
+**/.venv/
+venv/
+**/venv/
+
+# 2. PYTHON CACHE AND TEST OUTPUT
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+**/.pytest_cache/
+.ruff_cache/
+**/.ruff_cache/
+.coverage
+htmlcov/
+
+# 3. LOCAL TOOLING AND CACHES
+.runtime/
+.tooling/
+.uv-cache/
+.packages/
+.hf-cache/
+.DS_Store
+
+# 4. NODE.JS DEPENDENCIES
+node_modules/
+**/node_modules/
+
+# 5. FRONTEND BUILD OUTPUT
+dist/
+**/dist/
+build/
+**/build/
+.next/
+**/.next/
+.wrangler/
+.turbo/
+
+# 6. ENVIRONMENT FILES AND SECRETS
+.env
+.env.*
+!.env.example
+!.env.*.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+
+.dev.vars
+.dev.vars.*
+
+# 7. PRIVATE KEYS AND CERTIFICATES
+*.pem
+*.key
+*.p12
+*.pfx
+
+# 8. LOCAL TEST IMAGES
+bus.jpg
+work-test.jpg
+
+# 9. MODEL FILE POLICY
+# Keep required model files trackable:
+# - yolov8n.pt
+# - models/pad/minifasnet_v2.onnx
+# - models/yunet/face_detection_yunet_2023mar.onnx
+#
+# Do not add *.pt or *.onnx here.
+
+# 10. LOCAL LOGS AND TEMPORARY FILES
+*.log
+*.tmp
+*.temp
+*.bak
+
+# ==========================================
+# DEPLOYMENT CLEANUP - PRESERVE LOCAL FILES
+# ==========================================
+
+# Historical source backups
+*_before_*
+*_backup.*
+
+# Separate unused Next.js project
+/next-app/
+
+# Legacy V5 preparation script
+/prepare_v5.ps1
+
+# Legacy root-level web files
+/web/*.html
+/web/*.js
+
+# Temporary V6 validation file
+/web/v6/.vision_syntax_check.js
+
+# Old V6 HTML backups
+/web/v6/*before*
+
+# Unrelated local text artifact
+/tests/ntinue-my-mosip-biosentinels-livesh.txt

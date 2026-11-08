@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d18">
+<title>LiveShield V6 | BioSentinels</title>
+
+<style>
+:root {
+    --bg:#080d18;
+    --panel:#101a2b;
+    --panel2:#152238;
+    --line:#263650;
+    --text:#eaf2ff;
+    --muted:#91a2bc;
+    --cyan:#50e3d0;
+    --blue:#75a8ff;
+    --purple:#c58aff;
+    --orange:#ffbf70;
+    --green:#54d99b;
+    --red:#ff777f;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+}
+button{font:inherit}
+.app{display:flex;min-height:100vh}
+.sidebar{
+    width:255px;
+    background:#0b1423;
+    border-right:1px solid var(--line);
+    padding:25px 16px;
+    display:flex;
+    flex-direction:column;
+    flex-shrink:0;
+}
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:0 10px 28px;
+}
+.logo{
+    width:39px;height:39px;border-radius:12px;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#50e3d0,#3688ff);
+    color:#06131d;font-weight:900;font-size:20px;
+}
+.brand h2{font-size:16px;margin:0}
+.brand small{color:var(--muted);font-size:10px;letter-spacing:1.4px}
+.nav-label{
+    color:#62748e;font-size:10px;font-weight:800;
+    letter-spacing:1.6px;padding:14px 12px 8px;
+}
+.nav button{
+    width:100%;border:0;background:transparent;
+    color:var(--muted);text-align:left;
+    padding:12px;border-radius:9px;
+    margin:2px 0;cursor:pointer;font-size:13px;
+}
+.nav button:hover,.nav button.active{
+    color:var(--cyan);background:#14263a;
+}
+.sidebar-footer{
+    margin-top:auto;padding:14px;
+    border:1px solid var(--line);border-radius:12px;
+    font-size:11px;color:var(--muted);
+}
+.main{flex:1;min-width:0;padding:28px 32px}
+.topbar{
+    display:flex;justify-content:space-between;
+    align-items:center;gap:15px;margin-bottom:28px;
+}
+.eyebrow{color:var(--cyan);font-size:10px;letter-spacing:2px;font-weight:800}
+h1{font-size:25px;margin:7px 0}
+.subtitle{color:var(--muted);font-size:12px}
+.status{
+    display:flex;align-items:center;gap:8px;
+    border:1px solid var(--line);border-radius:30px;
+    padding:9px 13px;font-size:11px;color:var(--green);
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.page{display:none}
+.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.card{
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:18px;min-width:0;
+}
+.stat-label{font-size:11px;color:var(--muted)}
+.stat-value{font-size:27px;font-weight:750;margin:12px 0 5px}
+.stat-note{font-size:10px;color:var(--muted)}
+.section-title{font-size:14px;margin:0 0 15px}
+.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:15px;margin-top:16px}
+.workspace{
+    min-height:310px;background:#080e19;
+    border:1px dashed #344967;border-radius:12px;
+    display:flex;flex-direction:column;
+    justify-content:center;align-items:center;
+    text-align:center;padding:25px;
+}
+.workspace-icon{font-size:38px;margin-bottom:12px}
+.workspace p{font-size:12px;color:var(--muted);line-height:1.7}
+.action{
+    border:1px solid #327e83;background:#15363d;
+    color:var(--cyan);border-radius:8px;
+    padding:10px 15px;cursor:pointer;font-size:11px;
+}
+.action:disabled{opacity:.5;cursor:not-allowed}
+.info-row{
+    display:flex;justify-content:space-between;gap:10px;
+    padding:12px 0;border-bottom:1px solid var(--line);
+    font-size:11px;
+}
+.info-row span:first-child{color:var(--muted)}
+.tag{
+    border:1px solid var(--line);padding:4px 7px;
+    border-radius:6px;font-size:9px;color:var(--cyan);
+}
+.notice{
+    background:#302719;border:1px solid #69502d;
+    color:#ffd18c;padding:13px;border-radius:10px;
+    font-size:11px;line-height:1.7;
+}
+.page-heading{margin-bottom:18px}
+.page-heading h2{font-size:19px;margin:0 0 7px}
+.page-heading p{font-size:12px;color:var(--muted)}
+.health-value{color:var(--green)}
+.footer{
+    margin-top:30px;color:#64758d;font-size:10px;
+    text-align:center;padding:15px;
+}
+@media(max-width:1000px){
+    .sidebar{width:210px}
+    .grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:700px){
+    .app{display:block}
+    .sidebar{width:100%;padding:12px}
+    .brand{padding:5px 8px 12px}
+    .nav{display:flex;overflow:auto;gap:5px}
+    .nav-label,.sidebar-footer{display:none}
+    .nav button{white-space:nowrap;width:auto}
+    .main{padding:20px 14px}
+    .layout{grid-template-columns:1fr}
+    .topbar{align-items:flex-start}
+}
+
+.vision-stats{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:18px;
+}
+.vision-card{padding:18px}
+.vision-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:16px;
+}
+.vision-subtitle{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:6px;
+}
+.vision-actions{display:flex;gap:9px;flex-wrap:wrap}
+.action:disabled{opacity:.45;cursor:not-allowed}
+.action.secondary{
+    background:var(--surface2);
+    color:var(--text);
+    border:1px solid var(--border);
+}
+.vision-stage{
+    position:relative;
+    width:100%;
+    min-height:260px;
+    background:#050a12;
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+}
+#visionVideo{
+    display:block;
+    width:100%;
+    height:auto;
+    min-height:260px;
+    max-height:650px;
+    object-fit:contain;
+}
+
+#visionImagePreview{
+    display:block;
+    width:100%;
+    height:auto;
+    min-height:260px;
+    max-height:650px;
+    object-fit:contain;
+}
+/* Respect hidden state when switching between camera and image modes. */
+#visionVideo[hidden],
+#visionImagePreview[hidden]{
+    display:none !important;
+}
+
+#visionOverlay{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+}
+.vision-empty{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:var(--text);
+    background:#050a12;
+}
+.vision-empty p{
+    color:#9aa9bd;
+    font-size:12px;
+}
+.vision-results{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+    margin-top:15px;
+}
+.vision-result{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:11px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    font-size:13px;
+}
+@media(max-width:850px){
+    .vision-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .vision-toolbar{align-items:flex-start;flex-direction:column}
+}
+
+
+/* V6 OBJECT TRACKING */
+.tracking-stats {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:18px;
+}
+.tracking-stat {padding:20px}
+.tracking-stat span {
+    display:block;
+    font-size:10px;
+    letter-spacing:1px;
+    color:var(--muted);
+    margin-bottom:12px;
+}
+.tracking-stat strong {font-size:27px;color:var(--text)}
+.tracking-main,.tracking-results {padding:20px;margin-bottom:18px}
+.tracking-toolbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+}
+.tracking-toolbar p,.tracking-object p {
+    color:var(--muted);
+    font-size:12px;
+    margin-top:5px;
+}
+.tracking-actions {display:flex;gap:8px;flex-wrap:wrap}
+.tracking-actions button {
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 14px;
+    cursor:pointer;
+    background:var(--surface);
+    color:var(--text);
+}
+.tracking-actions button.primary {
+    background:var(--accent);
+    color:#07111e;
+    border-color:var(--accent);
+}
+.tracking-actions button:disabled {opacity:.45;cursor:not-allowed}
+.tracking-stage {
+    width:100%;
+    aspect-ratio:16/9;
+    background:#050b14;
+    border-radius:12px;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.tracking-stage video {
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:none;
+}
+.tracking-stage canvas {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+}
+.tracking-empty {
+    position:absolute;
+    text-align:center;
+    color:#dce7f5;
+    padding:20px;
+}
+.tracking-empty p {color:#8b9bb0;margin-top:8px;font-size:12px}
+.tracking-privacy {color:var(--muted);font-size:11px;margin-top:12px}
+.tracking-result-list {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+}
+.tracking-object {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px;
+}
+.tracking-object strong {color:var(--text)}
+@media(max-width:800px) {
+    .tracking-stats {grid-template-columns:repeat(2,minmax(0,1fr))}
+    .tracking-result-list {grid-template-columns:1fr}
+}
+
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="logo">L</div>
+        <div>
+            <h2>LiveShield V6</h2>
+            <small>BIOSENTINELS</small>
+        </div>
+    </div>
+
+    <div class="nav-label">PLATFORM</div>
+    <nav class="nav">
+        <button class="active" data-page="overview">â—ˆ Overview</button>
+        <button data-page="vision">â—Ž Live Vision</button>
+        <button data-page="tracking">âŒ– Object Tracking</button>
+        <button data-page="assistant">âœ§ Visual Assistant</button>
+        <button data-page="pad">â—‡ PAD Research</button>
+    </nav>
+
+    <div class="nav-label">INTELLIGENCE</div>
+    <nav class="nav">
+        <button data-page="analytics">â–¤ Analytics & History</button>
+        <button data-page="system">âŒ˜ GPU & System Health</button>
+        <button data-page="privacy">â—‰ Settings & Privacy</button>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div style="color:var(--cyan);font-weight:800;margin-bottom:7px">V6 DEVELOPMENT BUILD</div>
+        Independent test environment<br>
+        Biometric storage disabled
+    </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+    <div>
+        <div class="eyebrow">UNIFIED VISION INTELLIGENCE</div>
+        <h1 id="pageTitle">Overview</h1>
+        <div class="subtitle">MOSIP LiveShield Â· BioSentinels</div>
+    </div>
+    <div class="status"><span class="dot"></span> V6 API CONNECTIVITY</div>
+</header>
+
+<section class="page active" id="overview">
+    <div class="grid">
+        <div class="card"><div class="stat-label">AI COMPUTE</div><div class="stat-value" id="gpuStat">Checking</div><div class="stat-note">PyTorch runtime</div></div>
+        <div class="card"><div class="stat-label">OBJECT DETECTOR</div><div class="stat-value">YOLO</div><div class="stat-note">CUDA configured</div></div>
+        <div class="card"><div class="stat-label">FACE DETECTOR</div><div class="stat-value">YuNet</div><div class="stat-note">Local ONNX model</div></div>
+        <div class="card"><div class="stat-label">PAD RESEARCH</div><div class="stat-value">Experimental</div><div class="stat-note">Not validated</div></div>
+    </div>
+
+    <div class="layout">
+        <div class="card">
+            <h3 class="section-title">Vision Intelligence Platform</h3>
+            <div class="workspace">
+                <div class="workspace-icon">â—ˆ</div>
+                <strong>Welcome to LiveShield V6</strong>
+                <p>Your unified vision intelligence workspace.<br>
+                Camera analysis and tracking will be connected in upcoming phases.</p>
+                <button class="action" onclick="navigate('vision')">Open Live Vision</button>
+            </div>
+        </div>
+        <div class="card">
+            <h3 class="section-title">Platform Readiness</h3>
+            <div class="info-row"><span>V6 API</span><span id="apiState">Checking</span></div>
+            <div class="info-row"><span>PyTorch CUDA</span><span id="cudaState">Checking</span></div>
+            <div class="info-row"><span>ONNX CUDA</span><span id="onnxState">Checking</span></div>
+            <div class="info-row"><span>BLIP Captioner</span><span>Not ready</span></div>
+            <div class="info-row"><span>Biometric storage</span><span class="health-value">Disabled</span></div>
+            <div class="notice" style="margin-top:15px">PAD output is experimental and must never be used as an authentication or access-control decision.</div>
+        </div>
+    </div>
+</section>
+
+
+<section class="page" id="vision">
+    <div class="page-heading">
+        <h2>Live Vision</h2>
+        <p>Real-time camera analysis powered by the local YOLO vision engine.</p>
+    </div>
+
+    <div class="vision-stats">
+        <div class="card"><div class="stat-label">OBJECTS DETECTED</div><div class="stat-value" id="visionObjects">0</div></div>
+        <div class="card"><div class="stat-label">INFERENCE LATENCY</div><div class="stat-value" id="visionLatency">-- ms</div></div>
+        <div class="card"><div class="stat-label">PROCESSING FPS</div><div class="stat-value" id="visionFPS">0</div></div>
+        <div class="card"><div class="stat-label">EXECUTION DEVICE</div><div class="stat-value" id="visionDevice">Checking</div></div>
+    </div>
+
+    <div class="card vision-card">
+        <div class="vision-toolbar">
+            <div>
+                <strong>Camera workspace</strong>
+                <div class="vision-subtitle" id="cameraStatus">Camera stopped</div>
+            </div>
+            <div class="vision-actions">
+                <button class="action" id="startCamera">Start Camera</button>
+                <button class="action secondary" id="stopCamera" disabled>Stop Camera</button>
+                <label class="action secondary" for="visionImageInput">Upload Image</label>
+                <input type="file" id="visionImageInput"
+                       accept="image/jpeg,image/png,image/webp"
+                       hidden>
+            </div>
+        </div>
+
+        <div class="vision-stage" id="visionStage">
+            <video id="visionVideo" autoplay muted playsinline></video>
+            <img id="visionImagePreview" alt="Uploaded image preview" hidden>
+            <canvas id="visionOverlay"></canvas>
+            <div class="vision-empty" id="visionEmpty">
+                <div style="font-size:42px">?</div>
+                <strong>Camera is not active</strong>
+                <p>Start the camera to begin local object detection.</p>
+            </div>
+        </div>
+
+        <div class="vision-subtitle" id="visionMessage">
+            Camera frames are processed locally by your V6 API and are not saved.
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+        <strong>Detection results</strong>
+        <div class="vision-intelligence-grid"
+             style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:16px">
+
+            <div class="card">
+                <strong>Scene Understanding</strong>
+                <p id="visionScene">Waiting for image analysis...</p>
+                <small id="visionSceneEngine">BLIP status: checking</small>
+            </div>
+
+            <div class="card">
+                <strong>Face Analysis</strong>
+                <p id="visionFaces">No face analysis yet.</p>
+                <small id="visionQuality">Capture quality: pending</small>
+            </div>
+
+            <div class="card">
+                <strong>PAD Research</strong>
+                <p id="visionPAD">No PAD analysis yet.</p>
+                <small>Experimental and not validated for authentication.</small>
+            </div>
+        </div>
+
+        <div style="margin-top:18px">
+            <strong>Detection Results</strong>
+            <div id="visionResults" class="vision-results">
+                No detections yet.
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="page" id="tracking">
+    <div class="page-heading">
+        <h2>Object Tracking</h2>
+        <p>Real-time object detection, temporary tracking IDs and movement trajectories.</p>
+    </div>
+
+    <div class="tracking-stats">
+        <div class="card tracking-stat"><span>ACTIVE OBJECTS</span><strong id="trackActive">0</strong></div>
+        <div class="card tracking-stat"><span>FRAMES PROCESSED</span><strong id="trackFrames">0</strong></div>
+        <div class="card tracking-stat"><span>INFERENCE LATENCY</span><strong id="trackLatency">-- ms</strong></div>
+        <div class="card tracking-stat"><span>PROCESSING FPS</span><strong id="trackFPS">0</strong></div>
+    </div>
+
+    <div class="card tracking-main">
+        <div class="tracking-toolbar">
+            <div>
+                <strong>Live Tracking Camera</strong>
+                <p id="trackStatus">Camera stopped ? Tracking inactive</p>
+            </div>
+            <div class="tracking-actions">
+                <button class="btn primary" id="trackStart">Start Tracking</button>
+                <button class="btn" id="trackStop" disabled>Stop</button>
+                <button class="btn" id="trackReset">Reset</button>
+            </div>
+        </div>
+
+        <div class="tracking-stage">
+            <video id="trackVideo" autoplay muted playsinline></video>
+            <canvas id="trackCanvas"></canvas>
+            <div id="trackEmpty" class="tracking-empty">
+                <div class="workspace-icon">?</div>
+                <strong>Tracking camera is waiting</strong>
+                <p>Start tracking to detect and follow objects.</p>
+            </div>
+        </div>
+
+        <p class="tracking-privacy">Camera frames are processed temporarily. No camera images are saved.</p>
+    </div>
+
+    <div class="card tracking-results">
+        <div class="tracking-toolbar">
+            <div>
+                <strong>Tracked Objects</strong>
+                <p>Temporary IDs and movement information</p>
+            </div>
+            <span id="trackObjectCount">0 objects</span>
+        </div>
+        <div id="trackResults" class="tracking-result-list">
+            <div class="workspace">
+                <strong>No tracked objects yet</strong>
+                <p>Start the camera to populate tracking results.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="page" id="assistant">
+    <div class="page-heading">
+        <h2>Visual Assistant</h2>
+        <p>AI scene understanding and voice interaction.</p>
+    </div>
+
+    <style>
+        #assistant .va-grid {
+            display:grid;
+            grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr);
+            gap:18px;
+        }
+        #assistant .va-panel {
+            background:#101b2d;
+            border:1px solid #263b56;
+            border-radius:16px;
+            padding:20px;
+            margin-bottom:18px;
+        }
+        #assistant .va-preview {
+            width:100%;
+            min-height:260px;
+            max-height:440px;
+            background:#080f1d;
+            border:1px dashed #344c69;
+            border-radius:12px;
+            object-fit:contain;
+        }
+        #assistant .va-controls {
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-top:15px;
+        }
+        #assistant .va-controls button,
+        #assistant .va-button {
+            border:0;
+            border-radius:9px;
+            padding:11px 15px;
+            background:#16bca9;
+            color:#071522;
+            font-weight:700;
+            cursor:pointer;
+        }
+        #assistant .va-controls button.secondary {
+            background:#20334c;
+            color:#e5f1ff;
+        }
+        #assistant button:disabled {
+            opacity:.45;
+            cursor:not-allowed;
+        }
+        #assistant .va-status {
+            color:#50e3c2;
+            font-size:13px;
+            margin-top:12px;
+        }
+        #assistant .va-caption {
+            min-height:90px;
+            line-height:1.7;
+            color:#e3efff;
+            white-space:pre-wrap;
+        }
+        #assistant .va-input {
+            width:100%;
+            box-sizing:border-box;
+            background:#080f1d;
+            color:white;
+            border:1px solid #344c69;
+            border-radius:9px;
+            padding:12px;
+            margin:8px 0;
+        }
+        #assistant .va-muted {
+            color:#91a8c7;
+            font-size:13px;
+        }
+        #assistant .va-chip {
+            display:inline-block;
+            padding:6px 10px;
+            margin:4px;
+            background:#1b3048;
+            border-radius:20px;
+            color:#63e7d0;
+            font-size:12px;
+        }
+        @media(max-width:850px) {
+            #assistant .va-grid {
+                grid-template-columns:1fr;
+            }
+        }
+    </style>
+
+    <div class="va-grid">
+        <div>
+            <div class="va-panel">
+                <h3>Live Camera / Image</h3>
+                <video id="vaVideo" class="va-preview" autoplay muted playsinline hidden></video>
+                <img id="vaImage" class="va-preview" alt="Uploaded image preview" hidden>
+                <div id="vaEmpty" class="va-preview" style="display:flex;align-items:center;justify-content:center;color:#91a8c7;">
+                    Camera or image preview will appear here.
+                </div>
+
+                <div class="va-controls">
+                    <button id="vaStart">Start Camera</button>
+                    <button id="vaCapture" class="secondary" disabled>Describe Scene</button>
+                    <button id="vaStop" class="secondary" disabled>Stop Camera</button>
+                    <button id="vaUpload" class="secondary">Upload Image</button>
+                    <input id="vaFile" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+                </div>
+
+                <div id="vaStatus" class="va-status">Assistant ready. Waiting for input.</div>
+            </div>
+
+            <div class="va-panel">
+                <h3>AI Scene Description</h3>
+                <div id="vaCaption" class="va-caption">
+                    Capture a camera frame or upload an image to begin.
+                </div>
+                <div id="vaEngine" class="va-muted">Caption engine: Waiting</div>
+                <div id="vaLatency" class="va-muted">Inference: --</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="va-panel">
+                <h3>Detected Objects</h3>
+                <div id="vaObjects" class="va-muted">No analysis available yet.</div>
+            </div>
+
+            <div class="va-panel">
+                <h3>Ask About the Scene</h3>
+                <p class="va-muted">Answers use the latest AI description and detected-object labels.</p>
+                <input id="vaQuestion" class="va-input" type="text" maxlength="300" placeholder="Ask about the current scene...">
+                <div class="va-controls">
+                    <button id="vaAsk">Ask</button>
+                    <button id="vaMic" class="secondary">Voice Input</button>
+                    <button id="vaSpeak" class="secondary">Speak Description</button>
+                </div>
+                <div id="vaAnswer" class="va-caption" style="margin-top:15px;">Your answer will appear here.</div>
+            </div>
+
+            <div class="va-panel">
+                <h3>Assistant Engine</h3>
+                <div id="vaModelStatus" class="va-status">Checking captioning model...</div>
+                <p class="va-muted">Local image processing. Images are processed in memory and are not saved by this feature.</p>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="vaCanvas" hidden></canvas>
+</section>
+
+<section class="page" id="pad">
+    <div class="page-heading"><h2>PAD Research</h2><p>Presentation-attack research diagnostics.</p></div>
+    <div class="notice">Experimental model outputs are not independently validated, are not calibrated confidence scores, and cannot establish identity or authorize access.</div>
+</section>
+
+<section class="page" id="analytics">
+    <div class="page-heading"><h2>Analytics & History</h2><p>Privacy-conscious platform activity.</p></div>
+    <div class="card"><div class="workspace"><div class="workspace-icon">â–¤</div><strong>No analytics events yet</strong><p>Non-biometric aggregate analytics will be introduced in a later phase.</p></div></div>
+</section>
+
+<section class="page" id="system">
+    <div class="page-heading"><h2>GPU & System Health</h2><p>Live compute runtime information.</p></div>
+    <div class="card" id="systemDetails">Loading system information...</div>
+</section>
+
+<section class="page" id="privacy">
+    <div class="page-heading"><h2>Settings & Privacy</h2><p>Privacy-first processing configuration.</p></div>
+    <div class="card">
+        <div class="info-row"><span>Biometric frame storage</span><strong class="health-value">Disabled</strong></div>
+        <div class="info-row"><span>Face recognition</span><strong>Not implemented</strong></div>
+        <div class="info-row"><span>Identity matching</span><strong>Not implemented</strong></div>
+        <div class="info-row"><span>Session tracking</span><strong>Planned</strong></div>
+    </div>
+</section>
+
+<div class="footer">MOSIP LiveShield V6 Â· BioSentinels Â· Independent development environment</div>
+</main>
+</div>
+
+<script>
+const pages = {
+    overview:"Overview",
+    vision:"Live Vision",
+    tracking:"Object Tracking",
+    assistant:"Visual Assistant",
+    pad:"PAD Research",
+    analytics:"Analytics & History",
+    system:"GPU & System Health",
+    privacy:"Settings & Privacy"
+};
+
+function navigate(name){
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    document.querySelectorAll("[data-page]").forEach(b=>b.classList.remove("active"));
+
+    const page=document.getElementById(name);
+    const button=document.querySelector(`[data-page="${name}"]`);
+
+    if(!page) return;
+    page.classList.add("active");
+    if(button) button.classList.add("active");
+    document.getElementById("pageTitle").textContent=pages[name];
+}
+
+document.querySelectorAll("[data-page]").forEach(button=>{
+    button.addEventListener("click",()=>navigate(button.dataset.page));
+});
+
+async function loadSystem(){
+    try{
+        const response=await fetch("/api/v6/system");
+        if(!response.ok) throw new Error("API unavailable");
+
+        const data=await response.json();
+        const compute=data.compute;
+
+        document.getElementById("apiState").textContent="Connected";
+        document.getElementById("apiState").className="health-value";
+
+        document.getElementById("gpuStat").textContent=
+            compute.cuda_available ? "GPU Active" : "CPU Mode";
+
+        document.getElementById("cudaState").textContent=
+            compute.cuda_available ? "Available" : "Unavailable";
+
+        const onnxGpu=compute.onnx_providers.includes("CUDAExecutionProvider");
+        document.getElementById("onnxState").textContent=
+            onnxGpu ? "Available" : "CPU only";
+
+        document.getElementById("systemDetails").innerHTML=`
+            <div class="info-row"><span>GPU</span><strong>${escapeHTML(compute.gpu_name || "Unavailable")}</strong></div>
+            <div class="info-row"><span>PyTorch</span><strong>${escapeHTML(compute.torch_version || "Unavailable")}</strong></div>
+            <div class="info-row"><span>CUDA</span><strong>${escapeHTML(compute.cuda_version || "Unavailable")}</strong></div>
+            <div class="info-row"><span>ONNX providers</span><strong>${escapeHTML(compute.onnx_providers.join(", "))}</strong></div>
+            <div class="info-row"><span>Preferred device</span><strong>${escapeHTML(compute.preferred_device)}</strong></div>
+        `;
+    }catch(error){
+        document.getElementById("apiState").textContent="Disconnected";
+        document.getElementById("systemDetails").textContent="V6 API is not reachable.";
+    }
+}
+
+function escapeHTML(value){
+    return String(value).replace(/[&<>"']/g,char=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    })[char]);
+}
+
+
+// V6 Unified Live Vision Controller
+const visionVideo = document.getElementById("visionVideo");
+const visionImagePreview = document.getElementById("visionImagePreview");
+const visionOverlay = document.getElementById("visionOverlay");
+const visionContext = visionOverlay.getContext("2d");
+
+const visionImageInput = document.getElementById("visionImageInput");
+const visionStartButton = document.getElementById("startCamera");
+const visionStopButton = document.getElementById("stopCamera");
+
+let visionStream = null;
+let visionRunning = false;
+let visionBusy = false;
+let visionFrames = 0;
+let visionLastSecond = Date.now();
+let visionLastScene = 0;
+let visionImageURL = null;
+
+function visionMessage(message){
+    document.getElementById("visionMessage").textContent = message;
+}
+
+function clearVisionOverlay(){
+    visionContext.clearRect(
+        0, 0, visionOverlay.width, visionOverlay.height
+    );
+}
+
+function drawUnifiedOverlay(data, width, height){
+    if(!width || !height) return;
+
+    visionOverlay.width = width;
+    visionOverlay.height = height;
+
+    clearVisionOverlay();
+
+    visionContext.lineWidth = Math.max(2, width / 500);
+    visionContext.font = `bold ${Math.max(14, width / 65)}px Arial`;
+
+    const objects = data.objects || [];
+
+    for(const item of objects){
+        const [x1,y1,x2,y2] = item.box;
+
+        visionContext.strokeStyle = "#25e6bd";
+        visionContext.strokeRect(x1,y1,x2-x1,y2-y1);
+
+        const label = `${item.label} ${(item.confidence*100).toFixed(1)}%`;
+        const textWidth = visionContext.measureText(label).width;
+
+        visionContext.fillStyle = "#087e70";
+        visionContext.fillRect(x1,Math.max(0,y1-25),textWidth+12,25);
+
+        visionContext.fillStyle = "#ffffff";
+        visionContext.fillText(label,x1+6,Math.max(18,y1-7));
+    }
+
+    const faces = data.face_boxes || [];
+
+    faces.forEach((box,index)=>{
+        const [x,y,w,h] = box;
+
+        visionContext.strokeStyle = "#f5b942";
+        visionContext.lineWidth = Math.max(2,width/400);
+        visionContext.strokeRect(x,y,w,h);
+
+        visionContext.fillStyle = "#f5b942";
+        visionContext.fillText(`Face ${index+1}`,x,Math.max(18,y-8));
+    });
+}
+
+function updateUnifiedResults(data){
+    const objects = data.objects || [];
+    const results = document.getElementById("visionResults");
+
+    if(!objects.length){
+        results.textContent = "No objects detected.";
+    }else{
+        results.innerHTML = objects.map(item=>`
+            <div class="vision-result">
+                <strong>${escapeHTML(item.label)}</strong>
+                <span>${(item.confidence*100).toFixed(1)}% confidence</span>
+            </div>
+        `).join("");
+    }
+
+    document.getElementById("visionObjects").textContent =
+        data.object_count ?? objects.length;
+
+    const faces = data.face_count ?? 0;
+    document.getElementById("visionFaces").textContent =
+        `${faces} face(s) detected. Face detection does not identify people.`;
+
+    const quality = data.quality || {};
+    document.getElementById("visionQuality").textContent =
+        `Capture quality: ${quality.passed === true ? "Passed" :
+        quality.passed === false ? "Needs improvement" : "Unavailable"}`;
+
+    const scene = data.scene || {};
+    document.getElementById("visionScene").textContent =
+        scene.description || "Scene captioning skipped for this frame.";
+
+    document.getElementById("visionSceneEngine").textContent =
+        `Engine: ${scene.engine || "Unavailable"}`;
+
+    const pad = data.pad || {};
+    const score = typeof pad.score === "number"
+        ? ` | Model score: ${pad.score.toFixed(4)}`
+        : "";
+
+    document.getElementById("visionPAD").textContent =
+        `${pad.status || "Unavailable"} | ${pad.label || "INCONCLUSIVE"}${score}`;
+
+    if(data.performance){
+        document.getElementById("visionLatency").textContent =
+            `${data.performance.inference_latency_ms} ms`;
+
+        document.getElementById("visionDevice").textContent =
+            String(data.performance.device || "unknown").toUpperCase();
+    }
+}
+
+async function submitUnifiedFrame(blob, filename, includeScene){
+    const form = new FormData();
+    form.append("frame",blob,filename);
+
+    const response = await fetch(
+        `/api/v6/analysis?include_scene=${includeScene}`,
+        {method:"POST",body:form}
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw new Error(data.detail || "Unified analysis failed.");
+    }
+
+    return data;
+}
+
+async function processVisionFrame(){
+    if(!visionRunning || visionBusy) return;
+
+    visionBusy = true;
+
+    try{
+        const width = visionVideo.videoWidth;
+        const height = visionVideo.videoHeight;
+
+        if(!width || !height) return;
+
+        const capture = document.createElement("canvas");
+        capture.width = width;
+        capture.height = height;
+
+        capture.getContext("2d").drawImage(
+            visionVideo,0,0,width,height
+        );
+
+        const blob = await new Promise(resolve=>
+            capture.toBlob(resolve,"image/jpeg",0.80)
+        );
+
+        if(!blob) throw new Error("Camera frame capture failed.");
+
+        const now = Date.now();
+
+        // Request BLIP periodically, not on every camera frame.
+        const includeScene = now - visionLastScene >= 15000;
+
+        const data = await submitUnifiedFrame(
+            blob,"camera.jpg",includeScene
+        );
+
+        if(includeScene) visionLastScene = Date.now();
+
+        if(!visionRunning) return;
+
+        drawUnifiedOverlay(data,width,height);
+        updateUnifiedResults(data);
+
+        visionFrames++;
+
+        if(now-visionLastSecond >= 1000){
+            const fps = visionFrames / ((now-visionLastSecond)/1000);
+
+            document.getElementById("visionFPS").textContent =
+                fps.toFixed(1);
+
+            visionFrames = 0;
+            visionLastSecond = now;
+        }
+
+        visionMessage(
+            `Unified vision active | ${data.object_count} objects | ` +
+            `${data.face_count} faces | Local processing, no image storage.`
+        );
+
+    }catch(error){
+        visionMessage("Vision error: "+error.message);
+    }finally{
+        visionBusy = false;
+
+        if(visionRunning){
+            setTimeout(processVisionFrame,250);
+        }
+    }
+}
+
+function clearVisionImage(){
+    visionImagePreview.hidden = true;
+    visionImagePreview.removeAttribute("src");
+
+    if(visionImageURL){
+        URL.revokeObjectURL(visionImageURL);
+        visionImageURL = null;
+    }
+}
+
+function stopVisionCamera(){
+    visionRunning = false;
+
+    if(visionStream){
+        visionStream.getTracks().forEach(track=>track.stop());
+        visionStream = null;
+    }
+
+    visionVideo.pause();
+    visionVideo.srcObject = null;
+    visionVideo.hidden = true;
+
+    visionStartButton.disabled = false;
+    visionStopButton.disabled = true;
+
+    document.getElementById("visionEmpty").style.display = "flex";
+    document.getElementById("cameraStatus").textContent = "Camera stopped";
+
+    clearVisionOverlay();
+
+    visionMessage("Camera stopped. No frames are stored.");
+}
+
+async function startVisionCamera(){
+    try{
+        stopVisionCamera();
+        clearVisionImage();
+
+        visionMessage("Requesting camera permission...");
+
+        visionStream = await navigator.mediaDevices.getUserMedia({
+            video:{facingMode:"environment"},
+            audio:false
+        });
+
+        visionVideo.hidden = false;
+        visionVideo.srcObject = visionStream;
+
+        await visionVideo.play();
+
+        visionRunning = true;
+        visionFrames = 0;
+        visionLastSecond = Date.now();
+        visionLastScene = Date.now();
+
+        document.getElementById("visionEmpty").style.display = "none";
+        document.getElementById("cameraStatus").textContent = "Camera active";
+
+        visionStartButton.disabled = true;
+        visionStopButton.disabled = false;
+
+        visionMessage("Camera connected. Starting unified vision analysis...");
+        processVisionFrame();
+
+    }catch(error){
+        stopVisionCamera();
+        visionMessage("Camera unavailable: "+error.message);
+    }
+}
+
+async function analyzeUploadedImage(file){
+    if(!file) return;
+
+    const allowed = ["image/jpeg","image/png","image/webp"];
+
+    if(!allowed.includes(file.type)){
+        visionMessage("Please select a JPEG, PNG or WebP image.");
+        visionImageInput.value = "";
+        return;
+    }
+
+    if(file.size > 50_000_000){
+        visionMessage("Image exceeds the 50 MB upload limit.");
+        visionImageInput.value = "";
+        return;
+    }
+
+    // Validate actual decoded dimensions before sending the image.
+    let imageBitmap;
+
+    try{
+        imageBitmap = await createImageBitmap(file);
+
+        const megapixels =
+            (imageBitmap.width * imageBitmap.height) / 1_000_000;
+
+        if(megapixels > 100){
+            visionMessage(
+                `Image is ${megapixels.toFixed(1)} MP. Maximum supported resolution is 100 MP.`
+            );
+            visionImageInput.value = "";
+            return;
+        }
+
+        console.log(
+            `Upload validation passed: ${imageBitmap.width} ? ${imageBitmap.height} (${megapixels.toFixed(1)} MP)`
+        );
+
+    }catch(error){
+        visionMessage("Could not decode this image. Try another supported image.");
+        visionImageInput.value = "";
+        return;
+    }finally{
+        if(imageBitmap) imageBitmap.close();
+    }
+
+    stopVisionCamera();
+    clearVisionImage();
+
+    visionVideo.hidden = true;
+    document.getElementById("visionEmpty").style.display = "none";
+
+    visionImageURL = URL.createObjectURL(file);
+    visionImagePreview.src = visionImageURL;
+    visionImagePreview.hidden = false;
+
+    visionMessage("Uploading image for full unified analysis...");
+
+    try{
+        await new Promise((resolve,reject)=>{
+            visionImagePreview.onload = resolve;
+            visionImagePreview.onerror = reject;
+        });
+
+        const data = await submitUnifiedFrame(file,file.name,true);
+
+        drawUnifiedOverlay(
+            data,
+            visionImagePreview.naturalWidth,
+            visionImagePreview.naturalHeight
+        );
+
+        updateUnifiedResults(data);
+
+        document.getElementById("cameraStatus").textContent =
+            "Image analysis complete";
+
+        visionMessage(
+            `Image analyzed | ${data.object_count} objects | ` +
+            `${data.face_count} faces | Full scene analysis completed.`
+        );
+
+    }catch(error){
+        visionMessage("Image analysis error: "+error.message);
+    }finally{
+        visionImageInput.value = "";
+    }
+}
+
+visionStartButton.addEventListener("click",startVisionCamera);
+visionStopButton.addEventListener("click",stopVisionCamera);
+
+visionImageInput.addEventListener("change",event=>{
+    analyzeUploadedImage(event.target.files[0]);
+});
+
+window.addEventListener("beforeunload",()=>{
+    stopVisionCamera();
+    clearVisionImage();
+});
+
+loadSystem();
+</script>
+
+<script>
+/* V6_TRACKING_CAMERA_SCRIPT */
+(() => {
+    const video = document.getElementById("trackVideo");
+    const canvas = document.getElementById("trackCanvas");
+    const startButton = document.getElementById("trackStart");
+    const stopButton = document.getElementById("trackStop");
+    const resetButton = document.getElementById("trackReset");
+
+    if (!video || !canvas || !startButton || startButton.dataset.initialized) return;
+    startButton.dataset.initialized = "true";
+
+    const ctx = canvas.getContext("2d");
+    const el = id => document.getElementById(id);
+
+    let stream = null;
+    let running = false;
+    let busy = false;
+    let frameCount = 0;
+    let fpsCount = 0;
+    let fpsStart = performance.now();
+
+    // Face movement history is temporary and browser-memory only.
+    let faceMovementTrail = [];
+
+    const FACE_TRAIL_DURATION = 1000;
+    const MAX_FACE_GAP = 450;
+
+    function status(message) {
+        el("trackStatus").textContent = message;
+    }
+
+    function clearFaceTrail() {
+        faceMovementTrail = [];
+    }
+
+    function drawTracking(data) {
+        const now = performance.now();
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const colors = [
+            "#00e5ff",
+            "#00ff9d",
+            "#ffcc66",
+            "#c792ff",
+            "#ff7b9c"
+        ];
+
+        // 1. Existing YOLO object tracking.
+        for (const object of data.tracked_objects || []) {
+            const [x1, y1, x2, y2] = object.box;
+            const color = colors[
+                Math.abs(object.track_id) % colors.length
+            ];
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+
+            const points = object.trajectory || [];
+
+            if (points.length > 1) {
+                ctx.beginPath();
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+
+                points.forEach((point, index) => {
+                    if (index === 0) {
+                        ctx.moveTo(point[0], point[1]);
+                    } else {
+                        ctx.lineTo(point[0], point[1]);
+                    }
+                });
+
+                ctx.stroke();
+            }
+
+            const label = "ID " + object.track_id + " | " + object.label;
+
+            ctx.font = "bold 15px Arial";
+
+            const labelWidth = ctx.measureText(label).width + 12;
+            const labelY = Math.max(0, y1 - 27);
+
+            ctx.fillStyle = color;
+            ctx.fillRect(x1, labelY, labelWidth, 25);
+
+            ctx.fillStyle = "#07111e";
+            ctx.fillText(label, x1 + 6, labelY + 18);
+        }
+
+        // 2. Detect the largest face in the current frame.
+        const faces = data.faces || [];
+
+        const largestFace = faces.reduce((largest, face) => {
+            if (
+                !Array.isArray(face.box) ||
+                !Array.isArray(face.center) ||
+                face.box.length < 4 ||
+                face.center.length < 2
+            ) {
+                return largest;
+            }
+
+            const [x, y, width, height] = face.box;
+            const area = width * height;
+
+            if (!largest || area > largest.area) {
+                return {
+                    center: face.center,
+                    area: area
+                };
+            }
+
+            return largest;
+        }, null);
+
+        // 3. Record the face-centre movement.
+        if (largestFace) {
+            const lastPoint = faceMovementTrail[
+                faceMovementTrail.length - 1
+            ];
+
+            const currentPoint = {
+                x: largestFace.center[0],
+                y: largestFace.center[1],
+                time: now
+            };
+
+            if (
+                !lastPoint ||
+                now - lastPoint.time > MAX_FACE_GAP
+            ) {
+                faceMovementTrail.push({
+                    ...currentPoint,
+                    breakBefore: true
+                });
+            } else {
+                faceMovementTrail.push(currentPoint);
+            }
+        }
+
+        // 4. Remove movement points older than one second.
+        faceMovementTrail = faceMovementTrail.filter(
+            point => now - point.time < FACE_TRAIL_DURATION
+        );
+
+        // 5. Draw the red fading movement trail.
+        for (let i = 1; i < faceMovementTrail.length; i++) {
+            const previous = faceMovementTrail[i - 1];
+            const current = faceMovementTrail[i];
+
+            if (current.breakBefore) continue;
+
+            const age = now - current.time;
+
+            const alpha = Math.max(
+                0,
+                Math.min(1, 1 - age / FACE_TRAIL_DURATION)
+            );
+
+            ctx.beginPath();
+
+            ctx.moveTo(previous.x, previous.y);
+            ctx.lineTo(current.x, current.y);
+
+            ctx.strokeStyle = `rgba(255, 35, 55, ${alpha})`;
+            ctx.lineWidth = 4;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+            ctx.stroke();
+        }
+
+        // 6. Mark the latest detected face centre.
+        if (largestFace) {
+            ctx.beginPath();
+
+            ctx.arc(
+                largestFace.center[0],
+                largestFace.center[1],
+                5,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle = "#ff2337";
+            ctx.fill();
+        }
+    }
+
+    function updateResults(data) {
+        const objects = data.tracked_objects || [];
+
+        el("trackActive").textContent =
+            data.active_count ?? objects.length;
+
+        el("trackFrames").textContent = frameCount;
+
+        el("trackLatency").textContent =
+            data.inference_latency_ms + " ms";
+
+        el("trackObjectCount").textContent =
+            objects.length + " objects";
+
+        el("trackResults").innerHTML = objects.length
+            ? objects.map(object =>
+                '<div class="tracking-object">' +
+                '<strong>Track #' + object.track_id +
+                ' | ' + object.label + '</strong>' +
+                '<p>Detection score: ' +
+                (object.confidence * 100).toFixed(1) + '%</p>' +
+                '<p>Position: ' +
+                object.centroid.join(", ") + '</p>' +
+                '<p>Trajectory points: ' +
+                object.trajectory.length + '</p>' +
+                '</div>'
+            ).join("")
+            : '<div class="workspace"><strong>No objects detected</strong><p>Waiting for detectable objects.</p></div>';
+    }
+
+    async function processFrame() {
+        if (!running || busy) return;
+
+        busy = true;
+
+        try {
+            const capture = document.createElement("canvas");
+
+            capture.width = video.videoWidth;
+            capture.height = video.videoHeight;
+
+            capture.getContext("2d").drawImage(
+                video,
+                0,
+                0
+            );
+
+            const blob = await new Promise(resolve =>
+                capture.toBlob(resolve, "image/jpeg", 0.82)
+            );
+
+            if (!blob) {
+                throw new Error("Camera frame capture failed.");
+            }
+
+            const form = new FormData();
+
+            form.append(
+                "frame",
+                blob,
+                "tracking-frame.jpg"
+            );
+
+            const response = await fetch(
+                "/api/v6/tracking/frame",
+                {
+                    method: "POST",
+                    body: form
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.detail || "Tracking request failed."
+                );
+            }
+
+            if (!running) return;
+
+            frameCount++;
+            fpsCount++;
+
+            if (
+                canvas.width !== data.frame.width ||
+                canvas.height !== data.frame.height
+            ) {
+                canvas.width = data.frame.width;
+                canvas.height = data.frame.height;
+            }
+
+            drawTracking(data);
+            updateResults(data);
+
+            const now = performance.now();
+
+            if (now - fpsStart >= 1000) {
+                el("trackFPS").textContent = Math.round(
+                    fpsCount * 1000 / (now - fpsStart)
+                );
+
+                fpsCount = 0;
+                fpsStart = now;
+            }
+
+            status("Tracking active | " + data.device);
+
+        } catch (error) {
+            running = false;
+
+            startButton.disabled = false;
+            stopButton.disabled = true;
+
+            status("Tracking error: " + error.message);
+
+        } finally {
+            busy = false;
+        }
+
+        if (running) {
+            setTimeout(processFrame, 120);
+        }
+    }
+
+    async function stopCamera() {
+        running = false;
+
+        clearFaceTrail();
+
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+
+        video.srcObject = null;
+        video.style.display = "none";
+
+        el("trackEmpty").style.display = "block";
+
+        startButton.disabled = false;
+        stopButton.disabled = true;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        status("Camera stopped | Tracking inactive");
+
+        try {
+            await fetch("/api/v6/tracking/reset", {
+                method: "POST"
+            });
+        } catch (error) {
+            console.warn("Tracking reset request failed:", error);
+        }
+    }
+
+    startButton.addEventListener("click", async () => {
+        try {
+            startButton.disabled = true;
+
+            status("Requesting camera permission...");
+
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: false
+            });
+
+            video.srcObject = stream;
+
+            await video.play();
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            video.style.display = "block";
+            el("trackEmpty").style.display = "none";
+
+            const reset = await fetch(
+                "/api/v6/tracking/reset",
+                { method: "POST" }
+            );
+
+            if (!reset.ok) {
+                throw new Error("Could not reset tracking session.");
+            }
+
+            clearFaceTrail();
+
+            frameCount = 0;
+            fpsCount = 0;
+            fpsStart = performance.now();
+
+            el("trackFrames").textContent = "0";
+            el("trackFPS").textContent = "0";
+
+            running = true;
+
+            stopButton.disabled = false;
+
+            status("Starting tracking...");
+
+            processFrame();
+
+        } catch (error) {
+            await stopCamera();
+
+            status("Camera error: " + error.message);
+        }
+    });
+
+    stopButton.addEventListener("click", stopCamera);
+
+    resetButton.addEventListener("click", async () => {
+        try {
+            const response = await fetch(
+                "/api/v6/tracking/reset",
+                { method: "POST" }
+            );
+
+            if (!response.ok) {
+                throw new Error("Reset failed.");
+            }
+
+            clearFaceTrail();
+
+            frameCount = 0;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            el("trackActive").textContent = "0";
+            el("trackFrames").textContent = "0";
+            el("trackLatency").textContent = "-- ms";
+            el("trackFPS").textContent = "0";
+            el("trackObjectCount").textContent = "0 objects";
+
+            el("trackResults").innerHTML =
+                '<div class="workspace"><strong>Tracking session reset</strong><p>Ready for a fresh session.</p></div>';
+
+            status(
+                running
+                    ? "Tracking active | Session reset"
+                    : "Tracking session reset"
+            );
+
+        } catch (error) {
+            status("Reset error: " + error.message);
+        }
+    });
+
+    window.addEventListener("beforeunload", () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    });
+})();
+
+/* V6 VISUAL ASSISTANT */
+(() => {
+    const el = id => document.getElementById(id);
+
+    const video = el("vaVideo");
+    const image = el("vaImage");
+    const empty = el("vaEmpty");
+    const canvas = el("vaCanvas");
+    const context = canvas.getContext("2d");
+
+    let stream = null;
+    let lastCaption = "";
+    let lastObjects = [];
+    let busy = false;
+    let recognition = null;
+
+    function status(message) {
+        el("vaStatus").textContent = message;
+    }
+
+    function showPreview(type) {
+        video.hidden = type !== "video";
+        image.hidden = type !== "image";
+        empty.style.display = type === "empty" ? "flex" : "none";
+    }
+
+    async function analyzeBlob(blob, filename) {
+        if (busy) return;
+
+        busy = true;
+        status("Analyzing image with the V6 vision engine...");
+        el("vaCaption").textContent = "Processing...";
+        el("vaAnswer").textContent = "Waiting for analysis...";
+
+        try {
+            const form = new FormData();
+            form.append("frame", blob, filename);
+
+            const response = await fetch(
+                "/api/v6/analysis?include_scene=true",
+                { method: "POST", body: form }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || "Analysis request failed.");
+            }
+
+            const scene = data.scene || {};
+            lastCaption = scene.description || "No scene description returned.";
+            lastObjects = (data.objects || []).map(item => item.label);
+
+            el("vaCaption").textContent = lastCaption;
+            el("vaEngine").textContent =
+                "Caption engine: " + (scene.engine || "Unknown") +
+                " | Ready: " + (scene.ready ? "Yes" : "No");
+
+            el("vaLatency").textContent =
+                "Inference: " +
+                (data.performance?.inference_latency_ms ?? "--") + " ms";
+
+            const counts = {};
+            lastObjects.forEach(label => {
+                counts[label] = (counts[label] || 0) + 1;
+            });
+
+            el("vaObjects").innerHTML = Object.keys(counts).length
+                ? Object.entries(counts).map(([label, count]) =>
+                    `<span class="va-chip">${escapeHTML(label)} × ${count}</span>`
+                  ).join("")
+                : "No supported objects detected.";
+
+            el("vaAnswer").textContent =
+                "Scene analyzed. You can now ask a basic question about the detected content.";
+
+            status("Analysis completed successfully.");
+
+            if (scene.note) {
+                el("vaEngine").textContent += " | " + scene.note;
+            }
+
+        } catch (error) {
+            status("Analysis error: " + error.message);
+            el("vaCaption").textContent = "Could not analyze this image.";
+        } finally {
+            busy = false;
+        }
+    }
+
+    function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, char => ({
+            "&":"&amp;", "<":"&lt;", ">":"&gt;",
+            '"':"&quot;", "'":"&#39;"
+        })[char]);
+    }
+
+    el("vaStart").addEventListener("click", async () => {
+        try {
+            if (!navigator.mediaDevices?.getUserMedia) {
+                throw new Error("Camera access is unavailable in this browser.");
+            }
+
+            status("Requesting camera permission...");
+
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: false
+            });
+
+            video.srcObject = stream;
+            await video.play();
+
+            showPreview("video");
+            el("vaCapture").disabled = false;
+            el("vaStop").disabled = false;
+            status("Camera active. Click Describe Scene to analyze a frame.");
+
+        } catch (error) {
+            status("Camera error: " + error.message);
+        }
+    });
+
+    el("vaCapture").addEventListener("click", () => {
+        if (!stream || !video.videoWidth || busy) return;
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(blob => {
+            if (blob) analyzeBlob(blob, "camera-frame.jpg");
+            else status("Could not capture camera frame.");
+        }, "image/jpeg", 0.90);
+    });
+
+    el("vaStop").addEventListener("click", () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+
+        video.srcObject = null;
+        showPreview("empty");
+        el("vaCapture").disabled = true;
+        el("vaStop").disabled = true;
+        status("Camera stopped.");
+    });
+
+    el("vaUpload").addEventListener("click", () => el("vaFile").click());
+
+    el("vaFile").addEventListener("change", event => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+            status("Please select a JPEG, PNG, or WebP image.");
+            event.target.value = "";
+            return;
+        }
+
+        if (file.size > 50000000) {
+            status("Image exceeds the 50 MB upload limit.");
+            event.target.value = "";
+            return;
+        }
+
+        const objectURL = URL.createObjectURL(file);
+        image.src = objectURL;
+        showPreview("image");
+
+        image.onload = () => {
+            if (image.naturalWidth * image.naturalHeight > 100000000) {
+                status("Image exceeds the 100-megapixel limit.");
+                URL.revokeObjectURL(objectURL);
+                image.removeAttribute("src");
+                showPreview("empty");
+                return;
+            }
+
+            analyzeBlob(file, file.name);
+            URL.revokeObjectURL(objectURL);
+        };
+
+        image.onerror = () => {
+            status("Could not preview this image.");
+            URL.revokeObjectURL(objectURL);
+        };
+
+        event.target.value = "";
+    });
+
+    el("vaAsk").addEventListener("click", () => {
+        const question = el("vaQuestion").value.trim();
+
+        if (!lastCaption) {
+            el("vaAnswer").textContent = "Please analyze an image or camera frame first.";
+            return;
+        }
+
+        if (!question) {
+            el("vaAnswer").textContent = "Please enter a question.";
+            return;
+        }
+
+        const q = question.toLowerCase();
+        const labels = [...new Set(lastObjects)];
+
+        if (/object|item|detect|see|visible/.test(q)) {
+            el("vaAnswer").textContent = labels.length
+                ? "Detected object categories: " + labels.join(", ") + "."
+                : "No supported object categories were detected.";
+        } else if (/person|people|human/.test(q)) {
+            const people = lastObjects.filter(x => x.toLowerCase() === "person").length;
+            el("vaAnswer").textContent =
+                people ? "The object detector identified " + people + " person detection(s)." :
+                "The object detector did not identify a person in this frame.";
+        } else if (/describe|scene|happening|picture|image/.test(q)) {
+            el("vaAnswer").textContent = lastCaption;
+        } else {
+            el("vaAnswer").textContent =
+                "I can currently provide the scene caption and detected-object summary. " +
+                "Full conversational visual question answering is not implemented yet. " +
+                "Current scene: " + lastCaption;
+        }
+    });
+
+    el("vaMic").addEventListener("click", () => {
+        const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            status("Voice recognition is not supported in this browser.");
+            return;
+        }
+
+        if (recognition) {
+            recognition.stop();
+            recognition = null;
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = "en-IN";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => status("Listening...");
+        recognition.onresult = event => {
+            const transcript = event.results[0][0].transcript;
+            el("vaQuestion").value = transcript;
+            el("vaAsk").click();
+            status("Voice question received.");
+        };
+        recognition.onerror = event => status("Voice error: " + event.error);
+        recognition.onend = () => { recognition = null; };
+
+        recognition.start();
+    });
+
+    el("vaSpeak").addEventListener("click", () => {
+        if (!lastCaption) {
+            status("Analyze a scene before requesting speech.");
+            return;
+        }
+
+        if (!("speechSynthesis" in window)) {
+            status("Speech output is not supported in this browser.");
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(lastCaption);
+        utterance.lang = "en-IN";
+        utterance.onstart = () => status("Speaking scene description...");
+        utterance.onend = () => status("Speech completed.");
+        utterance.onerror = () => status("Speech playback failed.");
+
+        window.speechSynthesis.speak(utterance);
+    });
+
+    el("vaQuestion").addEventListener("keydown", event => {
+        if (event.key === "Enter") el("vaAsk").click();
+    });
+
+    async function checkCaptioner() {
+        try {
+            const response = await fetch("/api/v6/analysis/status");
+            if (!response.ok) throw new Error("Status unavailable");
+
+            const data = await response.json();
+            const text = JSON.stringify(data).toLowerCase();
+
+            el("vaModelStatus").textContent =
+                text.includes('"scene_captioner":"ready"')
+                    ? "Captioning engine: READY"
+                    : "Captioning status retrieved. Check analysis response for model details.";
+
+        } catch (error) {
+            el("vaModelStatus").textContent =
+                "Could not retrieve captioning status: " + error.message;
+        }
+    }
+
+    window.addEventListener("beforeunload", () => {
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    });
+
+    checkCaptioner();
+})();
+</script>
+
+</body>
+</html>
