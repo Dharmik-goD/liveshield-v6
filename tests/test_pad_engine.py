@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 import pytest
 
@@ -88,3 +89,41 @@ def test_infinite_model_output_returns_inconclusive(engine):
 
     assert result.label == "INCONCLUSIVE"
     assert result.score is None
+def test_crop_matches_upstream_for_centered_face(engine):
+    image = np.arange(240 * 320 * 3, dtype=np.uint8).reshape(240, 320, 3)
+    face_box = (100, 70, 60, 60)
+
+    actual = engine._prepare_face(image, face_box)
+
+    x1, y1, x2, y2 = engine._get_new_box(
+        320, 240, face_box, 2.7
+    )
+    expected_crop = image[y1:y2 + 1, x1:x2 + 1]
+    expected_resized = cv2.resize(expected_crop, (80, 80))
+    expected = np.transpose(
+        expected_resized.astype(np.float32) / 255.0,
+        (2, 0, 1),
+    )[None, ...]
+
+    np.testing.assert_allclose(actual, expected)
+    assert actual.shape == (1, 3, 80, 80)
+    assert actual.dtype == np.float32
+
+
+def test_crop_matches_upstream_near_image_boundary(engine):
+    image = np.arange(120 * 160 * 3, dtype=np.uint8).reshape(120, 160, 3)
+    face_box = (2, 3, 45, 45)
+
+    actual = engine._prepare_face(image, face_box)
+
+    x1, y1, x2, y2 = engine._get_new_box(
+        160, 120, face_box, 2.7
+    )
+    expected_crop = image[y1:y2 + 1, x1:x2 + 1]
+    expected_resized = cv2.resize(expected_crop, (80, 80))
+    expected = np.transpose(
+        expected_resized.astype(np.float32) / 255.0,
+        (2, 0, 1),
+    )[None, ...]
+
+    np.testing.assert_allclose(actual, expected)

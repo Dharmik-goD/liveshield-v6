@@ -105,3 +105,7 @@ work-test.jpg
 
 # Unrelated local text artifact
 /tests/ntinue-my-mosip-biosentinels-livesh.txt
+
+# Local PAD model research references
+/.minifasnet-upstream/
+/.pad-reference/

@@ -21,6 +21,7 @@ object_detector = vision_engine.object_detector
 object_tracker = ObjectTracker()
 
 
+
 async def decode_upload(frame: UploadFile):
     allowed_types = {
         "image/jpeg",
@@ -28,18 +29,36 @@ async def decode_upload(frame: UploadFile):
         "image/webp",
     }
 
+    MAX_UPLOAD_BYTES = 50_000_000
+    CHUNK_SIZE = 1_048_576
+
     if frame.content_type not in allowed_types:
         raise HTTPException(
             status_code=415,
             detail="Upload a JPEG, PNG or WebP image.",
         )
 
-    raw = await frame.read()
+    # Read incrementally to enforce the upload limit.
+    raw = bytearray()
 
-    if not raw or len(raw) > 50_000_000:
+    while True:
+        chunk = await frame.read(CHUNK_SIZE)
+
+        if not chunk:
+            break
+
+        if len(raw) + len(chunk) > MAX_UPLOAD_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail="Image exceeds the 50 MB upload limit.",
+            )
+
+        raw.extend(chunk)
+
+    if not raw:
         raise HTTPException(
             status_code=400,
-            detail="Empty image or image exceeds 50 MB.",
+            detail="Empty image.",
         )
 
     image_array = np.frombuffer(raw, dtype=np.uint8)
@@ -60,6 +79,7 @@ async def decode_upload(frame: UploadFile):
         )
 
     return image
+
 
 
 # PUBLIC: used by deployment health monitoring.

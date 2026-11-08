@@ -48,37 +48,77 @@ class ONNXPADEngine(PADEngine):
                 f"Unexpected model output shape: {outputs[0].shape}"
             )
 
+    @staticmethod
+    def _get_new_box(src_w, src_h, bbox, scale):
+        """Match MiniVision's upstream CropImage._get_new_box."""
+        x, y, box_w, box_h = bbox
+
+        scale = min(
+            (src_h - 1) / box_h,
+            min((src_w - 1) / box_w, scale),
+        )
+
+        new_width = box_w * scale
+        new_height = box_h * scale
+
+        center_x = box_w / 2 + x
+        center_y = box_h / 2 + y
+
+        left_top_x = center_x - new_width / 2
+        left_top_y = center_y - new_height / 2
+        right_bottom_x = center_x + new_width / 2
+        right_bottom_y = center_y + new_height / 2
+
+        if left_top_x < 0:
+            right_bottom_x -= left_top_x
+            left_top_x = 0
+
+        if left_top_y < 0:
+            right_bottom_y -= left_top_y
+            left_top_y = 0
+
+        if right_bottom_x > src_w - 1:
+            left_top_x -= right_bottom_x - src_w + 1
+            right_bottom_x = src_w - 1
+
+        if right_bottom_y > src_h - 1:
+            left_top_y -= right_bottom_y - src_h + 1
+            right_bottom_y = src_h - 1
+
+        return (
+            int(left_top_x),
+            int(left_top_y),
+            int(right_bottom_x),
+            int(right_bottom_y),
+        )
+
     def _prepare_face(self, image: np.ndarray, face_box: tuple) -> np.ndarray:
         if image is None or image.ndim != 3 or image.shape[2] != 3:
             raise ValueError("Expected a three-channel BGR image")
 
         x, y, width, height = map(float, face_box)
 
+        if not np.isfinite([x, y, width, height]).all():
+            raise ValueError("Non-finite face bounding box")
+
         if width <= 0 or height <= 0:
             raise ValueError("Invalid face bounding box")
 
         image_height, image_width = image.shape[:2]
 
-        center_x = x + width / 2.0
-        center_y = y + height / 2.0
+        x1, y1, x2, y2 = self._get_new_box(
+            image_width,
+            image_height,
+            (x, y, width, height),
+            self.CROP_SCALE,
+        )
 
-        crop_width = width * self.CROP_SCALE
-        crop_height = height * self.CROP_SCALE
-
-        x1 = max(0, int(round(center_x - crop_width / 2.0)))
-        y1 = max(0, int(round(center_y - crop_height / 2.0)))
-        x2 = min(image_width, int(round(center_x + crop_width / 2.0)))
-        y2 = min(image_height, int(round(center_y + crop_height / 2.0)))
-
-        if x2 <= x1 or y2 <= y1:
-            raise ValueError("Face crop falls outside the image")
-
-        crop = image[y1:y2, x1:x2]
+        crop = image[y1:y2 + 1, x1:x2 + 1]
 
         if crop.size == 0:
             raise ValueError("Empty face crop")
 
-        resized = cv2.resize(crop, (80, 80), interpolation=cv2.INTER_LINEAR)
+        resized = cv2.resize(crop, (80, 80))
         tensor = resized.astype(np.float32) / 255.0
         tensor = np.transpose(tensor, (2, 0, 1))[None, ...]
 
